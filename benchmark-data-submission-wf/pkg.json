@@ -1,0 +1,33 @@
+{
+    "name": "benchmark-data-submission-wf",
+    "version": "0.1.0",
+    "description": "ICGC-ARGO RDPC benchmark data submission workflow",
+    "main": "main.nf",
+    "deprecated": false,
+    "keywords": [
+        "seq",
+        "submission",
+        "rdpc"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/icgc-argo/benchmark-data-submission.git"
+    },
+    "dependencies": [
+      "github.com/icgc-argo-workflows/data-processing-utility-tools/payload-gen-seq-experiment@0.5.0.1",
+      "github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-download@2.6.2",
+      "github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-upload@2.6.1",
+      "github.com/icgc-argo-workflows/data-processing-utility-tools/cleanup-workdir@1.0.0.1",
+      "github.com/icgc-argo/benchmark-data-submission/pop-system-ids@0.1.0"
+    ],
+    "devDependencies": [],
+    "contributors": [
+        {
+            "name": "Linda Xiang",
+            "email": "linda.xiang@oicr.on.ca"
+        }
+    ],
+    "license": "GNU Affero General Public License v3",
+    "bugReport": "https://github.com/icgc-argo/benchmark-data-submission/issues",
+    "homepage": "https://github.com/icgc-argo/benchmark-data-submission#readme"
+}
