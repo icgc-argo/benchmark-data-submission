@@ -1,0 +1,27 @@
+{
+    "name": "benchmark-data-submission-wf",
+    "version": "0.1.0",
+    "description": "ICGC-ARGO RDPC benchmark data submission workflow",
+    "main": "main.nf",
+    "deprecated": false,
+    "keywords": [
+        "seq",
+        "submission",
+        "rdpc"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/icgc-argo/benchmark-data-submission.git"
+    },
+    "dependencies": [],
+    "devDependencies": [],
+    "contributors": [
+        {
+            "name": "Linda Xiang",
+            "email": "linda.xiang@oicr.on.ca"
+        }
+    ],
+    "license": "GNU Affero General Public License v3",
+    "bugReport": "https://github.com/icgc-argo/benchmark-data-submission/issues",
+    "homepage": "https://github.com/icgc-argo/benchmark-data-submission#readme"
+}
