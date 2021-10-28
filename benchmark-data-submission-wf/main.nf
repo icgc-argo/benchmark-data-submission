@@ -82,9 +82,9 @@ upload_params = [
 
 include { SongScoreDownload as dnld } from './wfpr_modules/github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-download@2.6.2/main.nf' params(download_params)
 include { SongScoreUpload as upload } from './wfpr_modules/github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-upload@2.6.1/main.nf' params(upload_params)
-include { cleanupWorkdir as cleanup } from './modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.3.0/process/cleanup-workdir'
-include { payloadGenSeqExperiment as pGenExp } from './wfpr_modules/github.com/icgc-argo/data-processing-utility-tools/payload-gen-seq-experiment@0.5.0/main.nf'
-include { popSystemId as popSids } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/pop-system-id@0.1.0/main.nf' 
+include { cleanupWorkdir as cleanup } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/cleanup-workdir@1.0.0.1/main.nf'
+include { payloadGenSeqExperiment as pGenExp } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/payload-gen-seq-experiment@0.5.0.1/main.nf'
+include { popSystemIds as popSids } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/pop-system-ids@0.1.0/main.nf' 
 
 
 // please update workflow code as needed
@@ -92,7 +92,12 @@ workflow BenchmarkDataSubmissionWf {
   take:  // update as needed
     study_id
     analysis_id
-    api_token
+    analysis_metadata
+    experiment_info_tsv
+    read_group_info_tsv
+    file_info_tsv
+    extra_info_tsv
+    sequencing_files
 
 
   main:  
@@ -143,33 +148,30 @@ workflow BenchmarkDataSubmissionWf {
     }
 
     // remove system IDs from analysis metadata
-    popSids()
+    popSids(analysis_metadata)
 
     // upload
-    upload(study_id, pGenVar.out.payload, sequencing_files)
+    upload(study_id, popSids.out.payload, sequencing_files)
 
     // cleanup, skip cleanup when running in local mode
     if (params.cleanup) {
       if (local_mode) {
         cleanup(
-          popSids.out, 
+          popSids.out.payload, 
           true
         )
       } else {
         cleanup(
-          dnld.out.files.concat(dnld.out.analysis_json, popSids.out).collect(),
+          dnld.out.files.concat(dnld.out.analysis_json, popSids.out.payload).collect(),
           upload.out.analysis_id
         )
       }
     }
-    
-
-
-
+  
 
   emit:  // update as needed
-    output_file = demoCopyFile.out.output_file
-
+    payload = popSids.out.payload
+    output_files = sequencing_files
 }
 
 
@@ -177,6 +179,13 @@ workflow BenchmarkDataSubmissionWf {
 // using this command: nextflow run <git_acc>/<repo>/<pkg_name>/<main_script>.nf -r <pkg_name>.v<pkg_version> --params-file xxx
 workflow {
   BenchmarkDataSubmissionWf(
-    file(params.input_file)
+    params.study_id,
+    params.analysis_id,
+    params.analysis_metadata,
+    params.experiment_info_tsv,
+    params.read_group_info_tsv,
+    params.file_info_tsv,
+    params.extra_info_tsv,
+    params.sequencing_files
   )
 }
