@@ -1,6 +1,6 @@
 {
-    "input_file": "input/test_rg_3.bam",
-    "expected_output": "expected/expected.test_rg_3.bam",
+    "input_file": "input/56847fc7-7457-4df2-847f-c77457edf2a4.wxs.normal.json",
+    "expected_output": "expected/expected.test-job-1.json",
     "publish_dir": "outdir",
     "cpus": 1,
     "mem": 0.5

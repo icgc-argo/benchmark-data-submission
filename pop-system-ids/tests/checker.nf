@@ -88,7 +88,7 @@ workflow checker {
     )
 
     file_smart_diff(
-      popSystemIds.out.output_file,
+      popSystemIds.out.payload,
       expected_output
     )
 }

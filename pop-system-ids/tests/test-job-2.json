@@ -1,6 +1,6 @@
 {
-    "input_file": "input/test_rg_3.bam",
-    "expected_output": "expected/expected.test_rg_3.bam",
+    "input_file": "input/1d891219-5b8e-4bc3-8912-195b8ebbc3d7.wxs.tumour.json",
+    "expected_output": "expected/expected.test-job-2.json",
     "publish_dir": "outdir",
     "container_registry": "ghcr.io",
     "cpus": 1,
