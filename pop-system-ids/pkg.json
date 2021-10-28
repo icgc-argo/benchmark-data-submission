@@ -1,0 +1,35 @@
+{
+    "name": "pop-system-ids",
+    "version": "0.1.0",
+    "description": "Pop out system Ids from song analysis",
+    "main": "main.nf",
+    "deprecated": false,
+    "keywords": [
+        "bioinformatics"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/icgc-argo/benchmark-data-submission.git"
+    },
+    "container": {
+        "registries": [
+            {
+                "registry": "ghcr.io",
+                "type": "docker",
+                "org": "icgc-argo",
+                "default": true
+            }
+        ]
+    },
+    "dependencies": [],
+    "devDependencies": [],
+    "contributors": [
+        {
+            "name": "Linda Xiang",
+            "email": "linda.xiang@oicr.on.ca"
+        }
+    ],
+    "license": "GNU Affero General Public License v3",
+    "bugReport": "https://github.com/icgc-argo/benchmark-data-submission/issues",
+    "homepage": "https://github.com/icgc-argo/benchmark-data-submission#readme"
+}
