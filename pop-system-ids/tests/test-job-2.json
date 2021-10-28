@@ -1,0 +1,8 @@
+{
+    "input_file": "input/1d891219-5b8e-4bc3-8912-195b8ebbc3d7.wxs.tumour.json",
+    "expected_output": "expected/expected.test-job-2.json",
+    "publish_dir": "outdir",
+    "container_registry": "ghcr.io",
+    "cpus": 1,
+    "mem": 0.5
+}
