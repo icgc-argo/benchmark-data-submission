@@ -1,2 +1,3 @@
-# benchmark-data-submission
-Workflow to submit benchmark and test datasets to RDPC Dev/QA env.
+# ICGC-ARGO RDPC Benchmark Data Submission Workflow
+
+Update this to describe your awesome project.
