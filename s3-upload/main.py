@@ -1,55 +1,99 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""
-  Copyright (C) 2021,  OICR
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
-
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-  Authors:
-    Linda Xiang
-"""
 
 import os
 import sys
+import json
 import argparse
 import subprocess
 
 
+def run_cmd(cmd):
+    stderr, p, success = '', None, True
+    try:
+        p = subprocess.Popen(cmd,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             shell=True)
+        stderr = p.communicate()[1].decode('utf-8')
+    except Exception as e:
+        print('Execution failed: %s' % e)
+        success = False
+
+    if p and p.returncode != 0:
+        print('Execution failed, none zero code returned. \nSTDERR: %s' % repr(stderr), file=sys.stderr)
+        success = False
+
+    if not success:
+        sys.exit(p.returncode if p.returncode else 1)
+
+    return
+
+
+def filename2file(upload_files):
+    filename_to_file = {}
+    for f in upload_files:
+      filename_to_file[os.path.basename(f)] = f
+
+    return filename_to_file
+
+
 def main():
-    """
-    Python implementation of tool: s3-upload
-
-    This is auto-generated Python code, please update as needed!
-    """
-
     parser = argparse.ArgumentParser(description='Tool: s3-upload')
-    parser.add_argument('-i', '--input-file', dest='input_file', type=str,
-                        help='Input file', required=True)
-    parser.add_argument('-o', '--output-dir', dest='output_dir', type=str,
-                        help='Output directory', required=True)
+    parser.add_argument("-s", dest="endpoint_url")
+    parser.add_argument("-b", dest="bucket_name")
+    parser.add_argument("-p", dest="payload")
+    parser.add_argument("-c", dest="access_key")
+    parser.add_argument("-k", dest="secret_key")
+    parser.add_argument("-f", dest="files_to_upload", type=str, nargs="+", required=True)
     args = parser.parse_args()
 
-    if not os.path.isfile(args.input_file):
-        sys.exit('Error: specified input file %s does not exist or is not accessible!' % args.input_file)
+    filename_to_file = filename2file(args.files_to_upload)
 
-    if not os.path.isdir(args.output_dir):
-        sys.exit('Error: specified output dir %s does not exist or is not accessible!' % args.output_dir)
+    with open(args.payload) as f:
+      payload = json.load(f)
 
-    subprocess.run(f"cp {args.input_file} {args.output_dir}/", shell=True, check=True)
+    if payload.get('analysisId'):
+      analysisId = payload['analysisId']
+    else:
+      analysisId = 'analysisId'
+
+    tumour_or_normal = payload['samples'][0]['specimen']['tumourNormalDesignation'].lower()
+
+    analysisType = payload['analysisType']['name']
+
+    path_prefix = "benchmark-datasets/%s/%s/%s/%s" % (
+                                                payload['studyId'],
+                                                payload['experiment']['experimental_strategy'],
+                                                analysisType,
+                                                tumour_or_normal
+                                            )
+
+    for object in payload['files']:
+      filename = object['fileName']
+      object_key = "%s/%s" % (path_prefix, filename)
+
+      if filename in filename_to_file:
+        file_to_upload = filename_to_file[filename]
+      else:
+        sys.exit(f"The filenames {filename} defined in the payload does not match what's in the inputs : {args.upload_files}")
+
+      run_cmd('AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s s5cmd --endpoint-url %s cp %s s3://%s/%s' % (
+              args.access_key,
+              args.secret_key,
+              args.endpoint_url,
+              file_to_upload,
+              args.bucket_name,
+              object_key))
+
+    payload_object_key = "%s/%s.%s.json" % (path_prefix, analysisId, analysisType)
+    run_cmd('AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s s5cmd --endpoint-url %s cp %s s3://%s/%s' % (
+        args.access_key,
+        args.secret_key,
+        args.endpoint_url,
+        args.payload,
+        args.bucket_name,
+        payload_object_key))
 
 
 if __name__ == "__main__":
-    main()
-
+  main()

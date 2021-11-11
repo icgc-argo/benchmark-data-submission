@@ -1,0 +1,9 @@
+{
+  "endpoint_url": "https://object.cancercollaboratory.org:9080",
+  "bucket_name": "genomics-public-data",
+  "payload": "input/6ddd54a1-22b0-4633-9dc9-f55403647f94.dna_alignment.payload.json",
+  "upload_files": [
+    "input/TEST-PR.DO250122.SA610149.wgs.20211110.aln.cram",
+    "input/TEST-PR.DO250122.SA610149.wgs.20211110.aln.cram.crai"
+  ]
+}

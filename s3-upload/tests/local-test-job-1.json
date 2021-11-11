@@ -1,0 +1,8 @@
+{
+  "endpoint_url": "https://object.cancercollaboratory.org:9080",
+  "bucket_name": "genomics-public-data",
+  "payload": "input/test_rg_3.sequencing_experiment.payload.json",
+  "upload_files": [
+    "input/test_rg_3.bam"
+  ]
+}
