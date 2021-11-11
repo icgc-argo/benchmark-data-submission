@@ -24,7 +24,7 @@
 /* this block is auto-generated based on info from pkg.json where   */
 /* changes can be made if needed, do NOT modify this block manually */
 nextflow.enable.dsl = 2
-version = '0.1.0'  // package version
+version = '0.2.0'  // package version
 
 container = [
     'ghcr.io': 'ghcr.io/icgc-argo/benchmark-data-submission.s3-upload'
@@ -45,7 +45,7 @@ params.publish_dir = ""  // set to empty string will disable publishDir
 
 // tool specific parmas go here, add / change as needed
 params.endpoint_url = "https://object.cancercollaboratory.org:9080"
-params.bucket_name = "benchmark-datasets"
+params.bucket_name = "genomics-public-data"
 params.payload = ""
 params.s3_access_key = ""
 params.s3_secret_key = ""
