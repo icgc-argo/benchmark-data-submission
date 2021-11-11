@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-LABEL org.opencontainers.image.source https://github.com/icgc-argo/data-processing-utility-tools
+LABEL org.opencontainers.image.source https://github.com/icgc-argo/benchmark-data-submission
 
 ENV DEBIAN_FRONTEND noninteractive
 
