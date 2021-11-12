@@ -24,7 +24,7 @@
 /* this block is auto-generated based on info from pkg.json where   */
 /* changes can be made if needed, do NOT modify this block manually */
 nextflow.enable.dsl = 2
-version = '0.2.0'  // package version
+version = '0.3.0'
 
 container = [
     'ghcr.io': 'ghcr.io/icgc-argo/benchmark-data-submission.s3-upload'
@@ -67,6 +67,9 @@ process s3Upload {
     val s3_secret_key
     path upload_files
 
+  output:
+    val bucket_name, emit: complete
+   
   script:
     // add and initialize variables here as needed
 
