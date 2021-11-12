@@ -38,6 +38,8 @@ params.study_id = ""
 params.analysis_id = ""
 
 params.cleanup = true
+params.s3upload = false
+params.rdpcupload = true 
 params.tempdir = "NO_DIR"
 
 params.analysis_metadata = "NO_FILE"
@@ -46,12 +48,17 @@ params.read_group_info_tsv = "NO_FILE2"
 params.file_info_tsv = "NO_FILE3"
 params.extra_info_tsv = "NO_FILE4"
 params.sequencing_files = []
+params.endpoint_url = ""
+params.bucket_name = ""
+params.s3_access_key = ""
+params.s3_secret_key = ""
 
 params.song_url = ""
 params.score_url = ""
 params.api_token = ""
 params.upload = [:]
 params.download = [:]
+params.s3Up = [:]
 
 download_params = [
     'song_cpus': params.cpus,
@@ -79,13 +86,21 @@ upload_params = [
     *:(params.upload ?: [:])
 ]
 
+s3Up_params = [
+    'endpoint_url': params.endpoint_url,
+    'bucket_name': params.bucket_name,
+    's3_access_key': params.s3_access_key,
+    's3_secret_key': params.s3_secret_key,
+    *:(params.s3Up ?: [:])
+]
 
 include { SongScoreDownload as dnld } from './wfpr_modules/github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-download@2.6.2/main.nf' params(download_params)
+include { songGetAnalysis as songGet } from './wfpr_modules/github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-download@2.6.2/local_modules/song-get-analysis' params(upload_params)
 include { SongScoreUpload as upload } from './wfpr_modules/github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-upload@2.6.1/main.nf' params(upload_params)
 include { cleanupWorkdir as cleanup } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/cleanup-workdir@1.0.0.1/main.nf'
 include { payloadGenSeqExperiment as pGenExp } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/payload-gen-seq-experiment@0.5.0.1/main.nf'
 include { popSystemIds as popSids } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/pop-system-ids@0.1.0/main.nf' 
-
+include { s3Upload as s3Up } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/s3-upload@0.2.0/main.nf' params(s3Up_params)
 
 // please update workflow code as needed
 workflow BenchmarkDataSubmissionWf {
@@ -121,8 +136,7 @@ workflow BenchmarkDataSubmissionWf {
             analysis_metadata = file(analysis_metadata)
         } else if (!experiment_info_tsv.startsWith("NO_FILE") &&
                     !read_group_info_tsv.startsWith("NO_FILE") &&
-                    !file_info_tsv.startsWith("NO_FILE") &&
-                    !extra_info_tsv.startsWith("NO_FILE")
+                    !file_info_tsv.startsWith("NO_FILE")
             ) {
             pGenExp(
                 file(experiment_info_tsv),
@@ -137,8 +151,7 @@ workflow BenchmarkDataSubmissionWf {
 
         sequencing_files = Channel.fromPath(sequencing_files)
     } else if (study_id && analysis_id) {
-        // download files and metadata from song/score (analysis type: sequencing_experiment)
-        log.info "Run the workflow using input sequencing data from SONG/SCORE, alignment results will be uploaded to SONG/SCORE as well"
+        // download files and metadata from song/score 
         dnld(study_id, analysis_id)
         analysis_metadata = dnld.out.analysis_json
         sequencing_files = dnld.out.files
@@ -150,28 +163,38 @@ workflow BenchmarkDataSubmissionWf {
     // remove system IDs from analysis metadata
     popSids(analysis_metadata)
 
-    // upload
-    upload(study_id, popSids.out.payload, sequencing_files)
-
+    // upload to song/score or openstack object store
+    if (params.rdpcupload && params.s3upload ) {
+      log.info "The data will be uploaded to both OpenStack S3 and RDPC SONG/SCORE as well"
+      upload(study_id, popSids.out.payload, sequencing_files)
+      // get back song analysis
+      songGet(study_id, upload.out.analysis_id)
+      s3Up(params.endpoint_url, params.bucket_name, songGet.out.json, params.s3_access_key, params.s3_secret_key, sequencing_files)
+    
+    } else if ( !params.rdpcupload && params.s3upload ) {
+      log.info "The data will be only uploaded to OpenStack S3"
+      s3Up(params.endpoint_url, params.bucket_name, analysis_metadata, params.s3_access_key, params.s3_secret_key, sequencing_files)
+    
+    } else if ( params.rdpcupload && !params.s3upload ) {
+      log.info "The data will be only uploaded to RDPC SONG/SCORE"
+      upload(study_id, popSids.out.payload, sequencing_files)
+    
+    } else {
+      exit 1, "Please specify `params.rdpcupload` or `params.s3upload` for uploading to either RDPC or S3 bucket.\n"
+    }
+    
     // cleanup, skip cleanup when running in local mode
-    if (params.cleanup) {
-      if (local_mode) {
-        cleanup(
-          popSids.out.payload, 
-          true
-        )
-      } else {
-        cleanup(
-          dnld.out.files.concat(dnld.out.analysis_json, popSids.out.payload).collect(),
-          upload.out.analysis_id
-        )
-      }
+    if ( params.cleanup && !local_mode && params.s3upload) {
+      cleanup(dnld.out.files.concat(dnld.out.analysis_json, popSids.out.payload).collect(),
+        s3Up.out.count())
+    } else if ( params.cleanup && !local_mode && !params.s3upload ){
+      cleanup(dnld.out.files.concat(dnld.out.analysis_json, popSids.out.payload).collect(),
+        upload.out.analysis_id)
     }
   
-
-  emit:  // update as needed
+  emit:  
     payload = popSids.out.payload
-    output_files = sequencing_files
+    upload_files = sequencing_files
 }
 
 

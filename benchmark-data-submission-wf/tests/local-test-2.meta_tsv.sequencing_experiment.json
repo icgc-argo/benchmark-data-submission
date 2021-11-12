@@ -1,0 +1,25 @@
+{
+    "study_id": "TEST-QA",
+    "publish_dir": "outdir",
+    "cleanup": false,
+    "s3upload": true,
+    "rdpcupload": true,
+    "cpus": 1,
+    "mem": 0.5,
+    "song_url": "https://song.rdpc-qa.cancercollaboratory.org",
+    "score_url": "https://score.rdpc-qa.cancercollaboratory.org",
+    "upload": {
+      "song_url": "https://submission-song.rdpc-qa.cancercollaboratory.org",
+      "song_cpus": 2,
+      "song_mem": 2,
+      "score_url": "https://submission-score.rdpc-qa.cancercollaboratory.org",
+      "score_cpus": 3,
+      "score_mem": 8
+    },
+    "endpoint_url": "https://object.cancercollaboratory.org:9080",
+    "bucket_name": "genomics-public-data",
+    "experiment_info_tsv": "input/experiment.tsv",
+    "read_group_info_tsv": "input/read_group.tsv",
+    "file_info_tsv": "input/file.tsv",
+    "sequencing_files": [ "input/test_rg_3.v2.bam" ]
+}
