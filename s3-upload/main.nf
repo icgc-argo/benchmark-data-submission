@@ -67,6 +67,9 @@ process s3Upload {
     val s3_secret_key
     path upload_files
 
+  output:
+    val bucket_name, emit: complete
+   
   script:
     // add and initialize variables here as needed
 
