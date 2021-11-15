@@ -1,0 +1,22 @@
+{
+    "study_id": "TEST-PR",
+    "analysis_id": "06debf07-a3a9-44b0-9ebf-07a3a954b07d",
+    "publish_dir": "outdir",
+    "cleanup": true,
+    "s3upload": false,
+    "rdpcupload": true,
+    "cpus": 1,
+    "mem": 0.5,
+    "song_url": "https://song.rdpc-qa.cancercollaboratory.org",
+    "score_url": "https://score.rdpc-qa.cancercollaboratory.org",
+    "download": {
+      "song_url": "https://song.rdpc-qa.cancercollaboratory.org",
+      "song_cpus": 2,
+      "song_mem": 2,
+      "score_url": "https://score.rdpc-qa.cancercollaboratory.org",
+      "score_cpus": 3,
+      "score_mem": 8
+    },
+    "endpoint_url": "https://object.cancercollaboratory.org:9080",
+    "bucket_name": "genomics-public-data"
+}
