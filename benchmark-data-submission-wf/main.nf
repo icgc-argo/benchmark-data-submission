@@ -75,14 +75,16 @@ download_params = [
 ]
 
 upload_params = [
-    'max_retries': params.max_retries,
-    'first_retry_wait_time': params.first_retry_wait_time,
-    'cpus': params.cpus,
-    'mem': params.mem,
+    'song_cpus': params.cpus,
+    'song_mem': params.mem,
+    'score_cpus': params.cpus,
+    'score_mem': params.mem,
     'song_url': params.song_url,
     'score_url': params.score_url,
     'api_token': params.api_token,
     'publish_dir': params.publish_dir,
+    'max_retries': params.max_retries,
+    'first_retry_wait_time': params.first_retry_wait_time,
     *:(params.upload ?: [:])
 ]
 
@@ -100,7 +102,7 @@ include { SongScoreUpload as upload } from './wfpr_modules/github.com/icgc-argo/
 include { cleanupWorkdir as cleanup } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/cleanup-workdir@1.0.0.1/main.nf'
 include { payloadGenSeqExperiment as pGenExp } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/payload-gen-seq-experiment@0.5.0.1/main.nf'
 include { popSystemIds as popSids } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/pop-system-ids@0.1.0/main.nf' 
-include { s3Upload as s3Up } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/s3-upload@0.2.0/main.nf' params(s3Up_params)
+include { s3Upload as s3Up } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/s3-upload@0.3.0/main.nf' params(s3Up_params)
 
 // please update workflow code as needed
 workflow BenchmarkDataSubmissionWf {
@@ -115,7 +117,12 @@ workflow BenchmarkDataSubmissionWf {
     sequencing_files
 
 
-  main:  
+  main: 
+    // detect 
+    if (!params.rdpcupload && !params.s3upload) {
+      exit 1, "Please specify at least one of `params.rdpcupload` and `params.s3upload` as destination for uploading to either RDPC or S3 bucket.\n"
+    }
+      
     // detect local mode or not
     local_mode = false
     if ((!analysis_metadata.startsWith("NO_FILE") || !experiment_info_tsv.startsWith("NO_FILE")) && sequencing_files.size() > 0){
@@ -151,13 +158,13 @@ workflow BenchmarkDataSubmissionWf {
 
         sequencing_files = Channel.fromPath(sequencing_files)
     } else if (study_id && analysis_id) {
-        // download files and metadata from song/score 
-        dnld(study_id, analysis_id)
-        analysis_metadata = dnld.out.analysis_json
-        sequencing_files = dnld.out.files
+      // download files and metadata from song/score 
+      dnld(study_id, analysis_id)
+      analysis_metadata = dnld.out.analysis_json
+      sequencing_files = dnld.out.files
     } else {
-        exit 1, "To use sequencing data from SONG/SCORE as input, please provide `params.study_id`, `params.analysis_id` and other SONG/SCORE params.\n" +
-            "Or please provide `params.analysis_metadata` (or `params.experiment_info_tsv`, `params.read_group_info_tsv`, `params.file_info_tsv` and `params.extra_info_tsv`) and `params.sequencing_files` from local files as input."
+      exit 1, "To use sequencing data from SONG/SCORE as input, please provide `params.study_id`, `params.analysis_id` and other SONG/SCORE params.\n" +
+          "Or please provide `params.analysis_metadata` (or `params.experiment_info_tsv`, `params.read_group_info_tsv`, `params.file_info_tsv` and `params.extra_info_tsv`) and `params.sequencing_files` from local files as input."
     }
 
     // remove system IDs from analysis metadata

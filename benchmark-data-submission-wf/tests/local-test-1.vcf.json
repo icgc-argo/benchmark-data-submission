@@ -2,7 +2,7 @@
     "study_id": "TEST-PR",
     "analysis_id": "06debf07-a3a9-44b0-9ebf-07a3a954b07d",
     "publish_dir": "outdir",
-    "cleanup": false,
+    "cleanup": true,
     "s3upload": false,
     "rdpcupload": true,
     "cpus": 1,
