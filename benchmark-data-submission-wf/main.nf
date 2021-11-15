@@ -127,10 +127,6 @@ workflow BenchmarkDataSubmissionWf {
     local_mode = false
     if ((!analysis_metadata.startsWith("NO_FILE") || !experiment_info_tsv.startsWith("NO_FILE")) && sequencing_files.size() > 0){
         local_mode = true
-        if (!params.publish_dir) {
-            exit 1, "You specified local sequencing data as input, please also set `params.publish_dir` to keep the output."
-        }
-        log.info "Run the workflow using local input sequencing data, alignment results will be in: ${params.publish_dir}"
 
         if (!analysis_metadata.startsWith("NO_FILE")) {
             if (!experiment_info_tsv.startsWith("NO_FILE") ||
