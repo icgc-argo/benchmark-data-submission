@@ -168,15 +168,15 @@ workflow BenchmarkDataSubmissionWf {
 
     // upload to song/score or openstack object store
     if (params.rdpcupload && params.s3upload ) {
-      log.info "The data will be uploaded to both OpenStack S3 and RDPC SONG/SCORE as well"
+      log.info "The data will be uploaded to both OpenStack S3 and RDPC SONG/SCORE."
       upload(study_id, popSids.out.payload, sequencing_files)
       // get back song analysis
       songGet(study_id, upload.out.analysis_id)
-      s3Up(params.endpoint_url, params.bucket_name, songGet.out.json, params.s3_access_key, params.s3_secret_key, sequencing_files)
+      s3Up(params.endpoint_url, params.bucket_name, songGet.out.json, params.s3_access_key, params.s3_secret_key, sequencing_files.collect())
     
     } else if ( !params.rdpcupload && params.s3upload ) {
       log.info "The data will be only uploaded to OpenStack S3"
-      s3Up(params.endpoint_url, params.bucket_name, analysis_metadata, params.s3_access_key, params.s3_secret_key, sequencing_files)
+      s3Up(params.endpoint_url, params.bucket_name, analysis_metadata, params.s3_access_key, params.s3_secret_key, sequencing_files.collect())
     
     } else if ( params.rdpcupload && !params.s3upload ) {
       log.info "The data will be only uploaded to RDPC SONG/SCORE"
