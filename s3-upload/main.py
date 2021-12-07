@@ -57,13 +57,20 @@ def main():
     else:
       analysisId = 'analysisId'
 
+    studyId = payload['studyId']
+    if 'donorId' in payload['samples'][0]['donor']:
+      donorId = payload['samples'][0]['donor']['donorId']
+    else:
+      donorId = payload['samples'][0]['donor']['submitterDonorId']
+
+    experimental_strategy = payload['experiment']['experimental_strategy']
+    analysisType = payload['analysisType']['name']
     tumour_or_normal = payload['samples'][0]['specimen']['tumourNormalDesignation'].lower()
 
-    analysisType = payload['analysisType']['name']
-
-    path_prefix = "benchmark-datasets/%s/%s/%s/%s" % (
-                                                payload['studyId'],
-                                                payload['experiment']['experimental_strategy'],
+    path_prefix = "benchmark-datasets/%s/%s/%s/%s/%s" % (
+                                                studyId,
+                                                donorId,
+                                                experimental_strategy,
                                                 analysisType,
                                                 tumour_or_normal
                                             )
