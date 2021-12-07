@@ -1,6 +1,6 @@
 {
     "name": "benchmark-data-submission-wf",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "ICGC-ARGO RDPC benchmark data submission workflow",
     "main": "main.nf",
     "deprecated": false,
