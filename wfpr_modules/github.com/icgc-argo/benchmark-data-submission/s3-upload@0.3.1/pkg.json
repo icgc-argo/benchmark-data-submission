@@ -1,0 +1,35 @@
+{
+    "name": "s3-upload",
+    "version": "0.3.1",
+    "description": "upload data to openstack s3 object storage",
+    "main": "main.nf",
+    "deprecated": false,
+    "keywords": [
+        "bioinformatics"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/icgc-argo/benchmark-data-submission.git"
+    },
+    "container": {
+        "registries": [
+            {
+                "registry": "ghcr.io",
+                "type": "docker",
+                "org": "icgc-argo",
+                "default": true
+            }
+        ]
+    },
+    "dependencies": [],
+    "devDependencies": [],
+    "contributors": [
+        {
+            "name": "Linda Xiang",
+            "email": "linda.xiang@oicr.on.ca"
+        }
+    ],
+    "license": "GNU Affero General Public License v3",
+    "bugReport": "https://github.com/icgc-argo/benchmark-data-submission/issues",
+    "homepage": "https://github.com/icgc-argo/benchmark-data-submission#readme"
+}
