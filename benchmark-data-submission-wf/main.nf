@@ -21,7 +21,7 @@
 */
 
 nextflow.enable.dsl = 2
-version = '0.2.0'
+version = '0.3.0'
 
 // universal params go here, change default value as needed
 params.container = ""
@@ -102,7 +102,7 @@ include { SongScoreUpload as upload } from './wfpr_modules/github.com/icgc-argo/
 include { cleanupWorkdir as cleanup } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/cleanup-workdir@1.0.0.1/main.nf'
 include { payloadGenSeqExperiment as pGenExp } from './wfpr_modules/github.com/icgc-argo-workflows/data-processing-utility-tools/payload-gen-seq-experiment@0.5.0.1/main.nf'
 include { popSystemIds as popSids } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/pop-system-ids@0.1.0/main.nf' 
-include { s3Upload as s3Up } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/s3-upload@0.3.0/main.nf' params(s3Up_params)
+include { s3Upload as s3Up } from './wfpr_modules/github.com/icgc-argo/benchmark-data-submission/s3-upload@0.3.1/main.nf' params(s3Up_params)
 
 // please update workflow code as needed
 workflow BenchmarkDataSubmissionWf {
